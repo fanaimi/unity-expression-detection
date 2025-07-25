@@ -1,0 +1,7 @@
+ULTRAFACE:
+
+version-RFB-640
+
+https://github.com/onnx/models/tree/main/validated/vision/body_analysis/ultraface
+
+https://github.com/onnx/models/blob/main/validated/vision/body_analysis/ultraface/models/version-RFB-640.onnx
