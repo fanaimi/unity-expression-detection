@@ -1,0 +1,5 @@
+https://github.com/onnx/models/tree/main
+
+https://github.com/onnx/models/tree/main/validated/vision/body_analysis/emotion_ferplus
+
+https://github.com/onnx/models/blob/main/validated/vision/body_analysis/emotion_ferplus/model/emotion-ferplus-8.onnx
