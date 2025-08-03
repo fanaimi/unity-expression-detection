@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Barracuda;
-using UnityEngine.Experimental.Rendering;
 
 public class WebcamDisplayer : MonoBehaviour
 {
     public RawImage rawImage;
+    public RectTransform boundingBox;
+
     [SerializeField]
     private FaceDetector faceDetector;
 
@@ -41,6 +42,7 @@ public class WebcamDisplayer : MonoBehaviour
         if (faceDetector != null)
         {
             faceDetector.FaceDetectorSetUp();
+            faceDetector.boundingBoxRect = boundingBox; // ✅ Connect boundingBox to FaceDetector
         }
         else
         {
@@ -69,7 +71,7 @@ public class WebcamDisplayer : MonoBehaviour
         {
             if (faceDetector != null && inputTensor != null)
             {
-                faceDetector.RunDetection(inputTensor);
+                faceDetector.RunFaceDetection(inputTensor);
             }
         }
     }
@@ -81,9 +83,14 @@ public class WebcamDisplayer : MonoBehaviour
         Color[] resizedPixels = ResizeBilinear(pixels, tex.width, tex.height, inputWidth, inputHeight);
         resized.SetPixels(resizedPixels);
         resized.Apply();
+        faceDetector.lastInputTexture = resized;  // resized is the preprocessed 640x480 image
+
+        // ✅ Save preview image
+        System.IO.File.WriteAllBytes(Application.dataPath + "/lastInput.png", resized.EncodeToPNG());
+        Debug.Log("[WebcamDisplayer] Saved input tensor preview to Assets/lastInput.png");
 
         Color32[] pixels32 = resized.GetPixels32();
-        Tensor tensor = new Tensor(1, inputHeight, inputWidth, 3); // NHWC (Batch, Height, Width, Channels)
+        Tensor tensor = new Tensor(1, inputHeight, inputWidth, 3);
 
         for (int y = 0; y < inputHeight; y++)
         {
@@ -101,8 +108,6 @@ public class WebcamDisplayer : MonoBehaviour
         Debug.Log("[WebcamDisplayer] Tensor populated as NHWC (1, 480, 640, 3).");
         return tensor;
     }
-
-
 
     private Color[] ResizeBilinear(Color[] original, int w, int h, int newW, int newH)
     {
